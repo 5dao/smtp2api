@@ -1,0 +1,16 @@
+
+
+Listen = ":27899"
+BasePath = "/api"
+
+SubjectPrefx = "SubjectPrefx: "
+
+tokenkey = "CCFKBBFPRBIDKSLAZZKMSBYOIERTBLOG"
+
+addrs = ["user1@qq.com","user2@163.com"]
+
+[[Accounts]]
+user = "yourname@example.com" 
+Password = "your password"
+smtp = "smtp.example.com:25"
+max = 100
