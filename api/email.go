@@ -34,7 +34,7 @@ func SendMail(host string, port int, account string, pwd string, to []string, cc
 	msg.SetBody("text/html", body)    //body
 	//msg.Attach("/home/Alex/lolcat.jpg")//attach files
 
-	cnn := gomail.NewDialer(host, 25, account, pwd)
+	cnn := gomail.NewDialer(host, port, account, pwd)
 	//cnn.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 	return cnn.DialAndSend(msg)
 }

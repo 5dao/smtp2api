@@ -1,86 +1,79 @@
 package utils
 
 import (
-	"log"
+	"errors"
 	"os"
 	"path/filepath"
-
+	"syscall"
 	"time"
+
+	"github.com/robfig/cron/v3"
+	log "github.com/sirupsen/logrus"
 )
 
-// make log file date
+//path/logs/xxx_20060102sign.log
 
-var logNow, logTomorrow time.Time
-var LogFile *os.File
-
-// /xx/xx/logs/xxx +  _20060102.log
-var logAbsPathPrefix string
+var filePrefix string
+var logFile *os.File
 
 func init() {
-	if !logGetFilePrefix() {
-		return
+	var err error
+	filePrefix, err = getPrefix()
+	if err != nil {
+		panic(err)
 	}
 
-	if logAbsPathPrefix == "" {
-		return
-	}
-
-	go logDateFile()
+	logCron := cron.New()
+	logCron.AddFunc("0 0 0 * * *", MakeDateLog)
+	logCron.Start()
 }
 
-func logDateFile() {
+// MakeDateLog make date.log
+func MakeDateLog() {
 	defer func() {
 		if rev := recover(); rev != nil {
-			go logDateFile()
+			log.Warn("MakeDateLog recover", rev)
 		}
 	}()
 
-	logMakeFile()
+	now := time.Now()
 
-	for {
-		select {
-		case <-time.After(logTomorrow.Sub(logNow)):
-			logMakeFile()
+	var err error
+
+	var fileName string
+	fileName = filePrefix + "_" + now.Format("20060102") + ".log"
+	oldMask := syscall.Umask(0)
+	newLogFile, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE|os.O_APPEND|os.O_SYNC, 0640)
+	syscall.Umask(oldMask)
+	if err != nil {
+		log.Println("logfile Run os.OpenFile err", err)
+		return
+	}
+	log.SetOutput(newLogFile)
+
+	//close old logfile
+	if logFile != nil {
+		err = logFile.Close()
+		if err != nil {
+			log.Println("logfile Run oldLogFile close", err)
 		}
 	}
+	logFile = newLogFile
 }
 
-func logMakeFile() {
-	logNow = time.Now()
-	logTomorrow = time.Date(logNow.Year(), logNow.Month(), logNow.Day()+1, 0, 0, 0, 0, logNow.Location())
-	if LogFile != nil {
-		LogFile.Close()
-	}
-	fileName := logAbsPathPrefix + "_" + logNow.Format("20060102") + ".log"
-	LogFile, _ = os.OpenFile(fileName, os.O_RDWR|os.O_CREATE|os.O_APPEND|os.O_SYNC, os.ModePerm)
-	log.SetOutput(LogFile)
-}
-
-// xx/bin/exe  xx/logs
-func logGetFilePrefix() bool {
+// path/logs/xxx
+func getPrefix() (string, error) {
 	instanceAbsPath, err := filepath.Abs(os.Args[0])
 	if err != nil {
-		log.Println("logGetFileName err", err)
-		return false
+		return "", errors.New("filepath err:" + err.Error())
 	}
 	instanceName := filepath.Base(instanceAbsPath)
 
-	//
-	excDir := filepath.Dir(instanceAbsPath)
+	dir := filepath.Dir(instanceAbsPath)
 
-	logsDir := filepath.Join(excDir, "logs")
+	oldMask := syscall.Umask(0)
+	os.Mkdir(filepath.Join(dir, "logs"), 0750)
+	syscall.Umask(oldMask)
 
-	_, err = os.Stat(logsDir)
-	if err != nil {
-
-		err2 := os.Mkdir(logsDir, os.ModePerm)
-		if err2 != nil {
-			log.Println("logGetFilePrefix mkdir err", err2)
-			return false
-		}
-	}
-
-	logAbsPathPrefix = filepath.Join(logsDir, instanceName)
-
-	return true
+	return filepath.Join(dir, "logs", instanceName), nil
 }

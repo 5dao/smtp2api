@@ -2,8 +2,10 @@ package main
 
 import (
 	"flag"
-	"log"
 	"os"
+
+	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/5dao/smtp2api/api"
 	"github.com/5dao/smtp2api/utils"
@@ -34,6 +36,11 @@ func main() {
 		os.Exit(0)
 		return
 	}
+
+	log.SetLevel(log.DebugLevel)
+	utils.MakeDateLog()
+
+	gin.SetMode(gin.ReleaseMode)
 
 	svr, err := api.NewServer(cfg)
 	if err != nil {

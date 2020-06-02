@@ -1,0 +1,15 @@
+[Unit]
+Description=smtp2api
+After=network.target
+
+[Service]
+Type=simple
+
+WorkingDirectory=/root/smtp2api
+ExecStart=/root/smtp2api/smtp2api -c /root/smtp2api/conf.toml
+
+Restart=on-failure
+RestartSec=2s
+
+[Install]
+WantedBy=default.target

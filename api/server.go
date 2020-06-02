@@ -3,7 +3,6 @@ package api
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -11,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 )
 
 const tokenSolt = "shishuilingqingshanyebian:"
@@ -69,6 +69,14 @@ func (svr *Server) Start() {
 func (svr *Server) InitRouter() {
 	svr.GinEg.Use(Cors())
 	svr.GinEg.POST(svr.Cfg.BasePath+"/mailto", svr.HandleMailTo)
+	svr.GinEg.GET(svr.Cfg.BasePath+"/test", func(c *gin.Context) {
+		c.JSON(200, &JSONResult{
+			Code: 0,
+			Msg:  "ok,RequestURI:" + c.Request.RequestURI,
+		})
+
+		return
+	})
 }
 
 // Cors Cors
@@ -106,7 +114,7 @@ func (svr *Server) HandleMailTo(c *gin.Context) {
 
 	rs := &JSONResult{
 		Code: -1,
-		Msg:  "send ok",
+		Msg:  "",
 	}
 
 	//token check
@@ -166,8 +174,11 @@ func (svr *Server) HandleMailTo(c *gin.Context) {
 	if err := svr.SendTo(to, cc, subject, body); err != nil {
 		rs.Code = 101
 		rs.Msg = fmt.Sprintf("send server error: %v", err)
+		goto RS
 	}
-	goto RS
+
+	rs.Code = 0
+	rs.Msg = "send ok"
 
 RS:
 	c.JSON(200, rs)
