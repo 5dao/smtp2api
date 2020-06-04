@@ -4,11 +4,11 @@ import (
 	"flag"
 	"os"
 
+	"github.com/5dao/golibs/log"
+	"github.com/BurntSushi/toml"
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
 
 	"github.com/5dao/smtp2api/api"
-	"github.com/5dao/smtp2api/utils"
 )
 
 var cfg *api.Config
@@ -26,19 +26,16 @@ func init() {
 
 func main() {
 	if makeKey {
-		log.Println(utils.AesRandomKey())
+		log.Println(api.AesRandomKey())
 		os.Exit(0)
 		return
 	}
 
-	if err := utils.LoadConfig(cfgFile, cfg); err != nil {
+	if _, err := toml.DecodeFile(cfgFile, cfg); err != nil {
 		log.Println(err)
 		os.Exit(0)
 		return
 	}
-
-	log.SetLevel(log.DebugLevel)
-	utils.MakeDateLog()
 
 	gin.SetMode(gin.ReleaseMode)
 

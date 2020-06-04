@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
+	"github.com/5dao/golibs/log"
 )
 
 const tokenSolt = "shishuilingqingshanyebian:"

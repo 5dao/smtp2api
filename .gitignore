@@ -11,3 +11,4 @@ vendor
 # bin
 
 client/client
+smtp2api
