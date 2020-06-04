@@ -1,5 +1,5 @@
-//Package api config
-package api
+//Package server config
+package server
 
 import "time"
 

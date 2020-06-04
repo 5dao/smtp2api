@@ -1,5 +1,5 @@
-//Package api aes
-package api
+//Package server aes
+package server
 
 import (
 	"crypto/aes"

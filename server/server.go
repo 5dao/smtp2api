@@ -1,5 +1,5 @@
-//Package api svr
-package api
+//Package server svr
+package server
 
 import (
 	"fmt"
@@ -9,8 +9,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/5dao/golibs/log"
+	"github.com/gin-gonic/gin"
 )
 
 const tokenSolt = "shishuilingqingshanyebian:"

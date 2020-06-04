@@ -8,16 +8,16 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/gin-gonic/gin"
 
-	"github.com/5dao/smtp2api/api"
+	"github.com/5dao/smtp2api/server"
 )
 
-var cfg *api.Config
+var cfg *server.Config
 var cfgFile string
 
 var makeKey bool
 
 func init() {
-	cfg = &api.Config{}
+	cfg = &server.Config{}
 
 	flag.StringVar(&cfgFile, "c", "conf.toml", "-c conf.toml")
 	flag.BoolVar(&makeKey, "key", false, "--key make random key")
@@ -26,7 +26,7 @@ func init() {
 
 func main() {
 	if makeKey {
-		log.Println(api.AesRandomKey())
+		log.Println(server.AesRandomKey())
 		os.Exit(0)
 		return
 	}
@@ -39,7 +39,7 @@ func main() {
 
 	gin.SetMode(gin.ReleaseMode)
 
-	svr, err := api.NewServer(cfg)
+	svr, err := server.NewServer(cfg)
 	if err != nil {
 		log.Println("NewServer err: ", err)
 		return

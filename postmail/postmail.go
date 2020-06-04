@@ -1,4 +1,4 @@
-package main
+package postmail
 
 import (
 	"crypto/aes"
@@ -6,34 +6,13 @@ import (
 	"crypto/md5"
 	"encoding/base64"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
 	"time"
 )
-
-var apiURL, subject, body, key string
-
-func init() {
-	flag.StringVar(&apiURL, "u", "http://127.0.0.1/api/mailto", "-u ")
-	flag.StringVar(&key, "k", "", "-k token key")
-	flag.StringVar(&subject, "s", "email subject", "-s subject")
-	flag.StringVar(&body, "m", "email body", "-m body")
-	flag.Parse()
-}
-
-func main() {
-	rs, err := PostMail(time.Now(), "shishuilingqingshanyebian:", apiURL, subject, body, key)
-	log.Println(rs, err)
-}
-
-//
-//
-//
 
 //JSONResult JSONResult
 type JSONResult struct {
