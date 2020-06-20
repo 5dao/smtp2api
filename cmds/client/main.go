@@ -20,6 +20,6 @@ func init() {
 }
 
 func main() {
-	rs, err := postmail.PostMail(time.Now(), "shishuilingqingshanyebian:", apiURL, subject, body, key)
+	rs, err := postmail.PostMail(time.Now(), "shishuilingqingshanyebian:", apiURL, subject, body, key, nil)
 	log.Println(rs, err)
 }
