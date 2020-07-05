@@ -9,6 +9,15 @@ import (
 	"github.com/5dao/smtp2api/postmail"
 )
 
+/*
+
+./client -u "http://127.0.0.1/api/mailto" \
+-k "key" \
+-s "cesi" \
+-m "this is test"
+
+*/
+
 var apiURL, subject, body, key string
 
 func init() {

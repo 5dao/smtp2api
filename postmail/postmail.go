@@ -23,11 +23,11 @@ type JSONResult struct {
 //PostMail PostMail
 //tokenSolt and key
 func PostMail(t time.Time, tokenSolt, apiURL, subject, body, key string, tos []string) (rs *JSONResult, err error) {
-	// defer func() {
-	// 	if rev := recover(); rev != nil {
-	// 		err = fmt.Errorf("PostMail rev: %v", rev)
-	// 	}
-	// }()
+	defer func() {
+		if rev := recover(); rev != nil {
+			err = fmt.Errorf("PostMail rev: %v", rev)
+		}
+	}()
 
 	values := make(url.Values)
 
@@ -42,11 +42,11 @@ func PostMail(t time.Time, tokenSolt, apiURL, subject, body, key string, tos []s
 
 	values.Add("token", token)
 	values.Add("t", timestampStr)
-	values.Add("subject", subject)
-	values.Add("body", body)
+	values.Add("subject", url.QueryEscape(subject))
+	values.Add("body", url.QueryEscape(body))
 
 	for _, to := range tos {
-		values.Add("to", to)
+		values.Add("to", url.QueryEscape(to))
 	}
 
 	var resp *http.Response

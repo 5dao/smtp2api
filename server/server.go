@@ -4,6 +4,7 @@ package server
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"sync"
@@ -107,9 +108,8 @@ type JSONResult struct {
 
 //HandleMailTo MailTo
 func (svr *Server) HandleMailTo(c *gin.Context) {
-	var to, cc []string
 	var subject, body string
-
+	var to, cc []string
 	to = svr.Cfg.Addrs
 
 	rs := &JSONResult{
@@ -123,7 +123,6 @@ func (svr *Server) HandleMailTo(c *gin.Context) {
 	var err error
 
 	var formToken, token, formTimestamp string
-	var formTo []string
 	var keyExist bool
 	var timestrap, timestrapLB int64
 
@@ -163,13 +162,24 @@ func (svr *Server) HandleMailTo(c *gin.Context) {
 		goto RS
 	}
 
-	if formTo, keyExist = c.GetPostFormArray("to"); keyExist {
-		to = append(to, formTo...)
+	if otherTos, keyExist := c.GetPostFormArray("to"); keyExist {
+		for _, toItem := range otherTos {
+			toItemStr, _ := url.QueryUnescape(toItem)
+			to = append(to, toItemStr)
+		}
 	}
 
-	cc, _ = c.GetPostFormArray("cc")
+	if otherCCs, keyExist := c.GetPostFormArray("cc"); keyExist {
+		for _, ccItem := range otherCCs {
+			ccItemStr, _ := url.QueryUnescape(ccItem)
+			cc = append(cc, ccItemStr)
+		}
+	}
+
 	subject, _ = c.GetPostForm("subject")
+	subject, _ = url.QueryUnescape(subject)
 	body, _ = c.GetPostForm("body")
+	body, _ = url.QueryUnescape(body)
 
 	if err := svr.SendTo(to, cc, subject, body); err != nil {
 		rs.Code = 101

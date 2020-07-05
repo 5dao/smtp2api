@@ -10,5 +10,5 @@ vendor
 
 # bin
 
-cmds/server/server
+cmds/smtp2api/smtp2api_*
 cmds/client/client
